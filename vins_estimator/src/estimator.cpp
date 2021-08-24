@@ -641,7 +641,7 @@ bool Estimator::failureDetection()
     if (Bas[WINDOW_SIZE].norm() > 2.5)
     {
         ROS_INFO(" big IMU acc bias estimation %f", Bas[WINDOW_SIZE].norm());
-        return true;
+        //return true;
     }
     if (Bgs[WINDOW_SIZE].norm() > 1.0)
     {
@@ -656,10 +656,10 @@ bool Estimator::failureDetection()
     }
     */
     Vector3d tmp_P = Ps[WINDOW_SIZE];
-    if ((tmp_P - last_P).norm() > 15)
+    if ((tmp_P - last_P).norm() > 5)
     {
         ROS_INFO(" big translation");
-        return true;
+        //return true;
     }
     if (abs(tmp_P.z() - last_P.z()) > 1)
     {
