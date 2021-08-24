@@ -143,8 +143,6 @@ void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
         return;
     }
     last_imu_t = imu_msg->header.stamp.toSec();
-    sensor_msgs::Imu msg = *imu_msg;
-    msg.linear_acceleration.z -= 9.81;
     m_buf.lock();
     imu_buf.push(imu_msg);
     m_buf.unlock();
@@ -343,7 +341,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "vins_estimator");
     ros::NodeHandle n("~");
-    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
+    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
     readParameters(n);
     estimator.setParameter();
 #ifdef EIGEN_DONT_PARALLELIZE
