@@ -1,9 +1,10 @@
 #include "visualization.h"
+#include <visualization_msgs/Marker.h>
 
 using namespace ros;
 using namespace Eigen;
 ros::Publisher pub_odometry, pub_latest_odometry;
-ros::Publisher pub_path, pub_relo_path;
+ros::Publisher pub_path, pub_relo_path, pub_path_marker;
 ros::Publisher pub_point_cloud, pub_margin_cloud;
 ros::Publisher pub_key_poses;
 ros::Publisher pub_relo_relative_pose;
@@ -24,6 +25,7 @@ void registerPub(ros::NodeHandle &n)
 {
     pub_latest_odometry = n.advertise<nav_msgs::Odometry>("imu_propagate", 1000);
     pub_path = n.advertise<nav_msgs::Path>("path", 1000);
+    pub_path_marker = n.advertise<visualization_msgs::Marker>("path_marker", 1000);
     pub_relo_path = n.advertise<nav_msgs::Path>("relocalization_path", 1000);
     pub_odometry = n.advertise<nav_msgs::Odometry>("odometry", 1000);
     pub_point_cloud = n.advertise<sensor_msgs::PointCloud>("point_cloud", 1000);
@@ -132,6 +134,26 @@ void pubOdometry(const Estimator &estimator, const std_msgs::Header &header)
         path.header = header;
         path.header.frame_id = "world";
         path.poses.push_back(pose_stamped);
+        // Create a marker for path publishing
+        visualization_msgs::Marker new_marker;
+        new_marker.id = 0;
+        new_marker.action = visualization_msgs::Marker::MODIFY;
+        new_marker.type = visualization_msgs::Marker::LINE_STRIP;
+        new_marker.scale.x = 0.5;
+        new_marker.scale.y = 0.5;
+        new_marker.scale.z = 0.5;
+        new_marker.color.r = 0.0;
+        new_marker.color.g = 1.0;
+        new_marker.color.b = 0.0;
+        new_marker.color.a = 1.0;
+        new_marker.pose.orientation.w = 1.0;
+        new_marker.header = path.header;
+
+        for (auto it = path.poses.begin(); it != path.poses.end(); ++it) {
+            geometry_msgs::Pose new_pose;
+            new_marker.points.push_back(it->pose.position);
+        }
+        pub_path_marker.publish(new_marker);
         pub_path.publish(path);
 
         Vector3d correct_t;
