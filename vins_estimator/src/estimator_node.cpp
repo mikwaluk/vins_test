@@ -143,7 +143,8 @@ void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
         return;
     }
     last_imu_t = imu_msg->header.stamp.toSec();
-
+    sensor_msgs::Imu msg = *imu_msg;
+    msg.linear_acceleration.z -= 9.81;
     m_buf.lock();
     imu_buf.push(imu_msg);
     m_buf.unlock();

@@ -145,7 +145,7 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
             if (mask.type() != CV_8UC1)
                 cout << "mask type wrong " << endl;
             if (mask.size() != forw_img.size())
-                cout << "wrong size " << endl;
+                cout << "wrong size. mask size " << mask.size() << " forw_img size " << forw_img.size() << endl;
             cv::goodFeaturesToTrack(forw_img, n_pts, MAX_CNT - forw_pts.size(), 0.01, MIN_DIST, mask);
         }
         else
@@ -188,7 +188,7 @@ void FeatureTracker::rejectWithF()
         }
 
         vector<uchar> status;
-        cv::findFundamentalMat(un_cur_pts, un_forw_pts, cv::FM_RANSAC, F_THRESHOLD, 0.99, status);
+        cv::findFundamentalMat(un_cur_pts, un_forw_pts, cv::FM_RANSAC, F_THRESHOLD, 0.999, status);
         int size_a = cur_pts.size();
         reduceVector(prev_pts, status);
         reduceVector(cur_pts, status);
