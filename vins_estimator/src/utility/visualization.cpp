@@ -1,6 +1,7 @@
 #include "visualization.h"
 #include <visualization_msgs/Marker.h>
 #include <logging_msgs/Bias.h>
+#include <logging_msgs/TrackedFeatures.h>
 
 using namespace ros;
 using namespace Eigen;
@@ -12,6 +13,7 @@ ros::Publisher pub_relo_relative_pose;
 ros::Publisher pub_camera_pose;
 ros::Publisher pub_camera_pose_visual;
 ros::Publisher pub_biases;
+ros::Publisher pub_tracked_features;
 nav_msgs::Path path, relo_path;
 
 ros::Publisher pub_keyframe_pose;
@@ -40,6 +42,7 @@ void registerPub(ros::NodeHandle &n)
     pub_extrinsic = n.advertise<nav_msgs::Odometry>("extrinsic", 1000);
     pub_relo_relative_pose=  n.advertise<nav_msgs::Odometry>("relo_relative_pose", 1000);
     pub_biases = n.advertise<logging_msgs::Bias>("estimated_bias", 1000);
+    pub_tracked_features = n.advertise<logging_msgs::TrackedFeatures>("tracked_features", 1000);
 
     cameraposevisual.setScale(1);
     cameraposevisual.setLineWidth(0.05);
@@ -144,9 +147,9 @@ void pubOdometry(const Estimator &estimator, const std_msgs::Header &header, Vec
         new_marker.id = 0;
         new_marker.action = visualization_msgs::Marker::MODIFY;
         new_marker.type = visualization_msgs::Marker::LINE_STRIP;
-        new_marker.scale.x = 0.5;
-        new_marker.scale.y = 0.5;
-        new_marker.scale.z = 0.5;
+        new_marker.scale.x = 0.1;
+        new_marker.scale.y = 0.1;
+        new_marker.scale.z = 0.1;
         new_marker.color.r = 0.0;
         new_marker.color.g = 1.0;
         new_marker.color.b = 0.0;
@@ -197,6 +200,10 @@ void pubOdometry(const Estimator &estimator, const std_msgs::Header &header, Vec
               << estimator.Vs[WINDOW_SIZE].y() << ","
               << estimator.Vs[WINDOW_SIZE].z() << "," << endl;
         foutC.close();
+        logging_msgs::TrackedFeatures tracked_features_msg;
+        tracked_features_msg.header = header;
+        tracked_features_msg.tracked_features.data = estimator.f_manager.last_track_num;
+        pub_tracked_features.publish(tracked_features_msg);
     }
 }
 
