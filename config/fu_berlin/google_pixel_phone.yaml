@@ -1,28 +1,29 @@
 %YAML:1.0
 
 #common parameters
-imu_topic: "/sensors/applanix/imu_data_gravity"
-image_topic: "/sensors/broadrreachcam_rear/image"
+imu_topic: "/phone1/android/imu"
+image_topic: "/image_proc_resize/image"
 output_path: "/home/mikolaj/Projects/catkin_vins/rviz/"
 
 #camera calibration 
 model_type: PINHOLE
 camera_name: camera
-image_width: 1280
-image_height: 800
-projection_parameters:
-   k1: 0.0
-   k2: 0.0
+image_width: 960 #1920
+image_height: 540 #1080
+projection_parameters: # distortion 0.088640 -0.249751 -0.005270 -0.008137 0.000000
+
+   k1: 0.088437 #0.088640
+   k2: -0.276300 #-0.249751
    p1: 0.0
    p2: 0.0
-   fx: 279.883600
-   fy: 283.607197
-   cx: 643.052984
-   cy: 398.301847
+   fx: 774.556600 #1625.658754
+   fy: 479.185731 #1641.527344
+   cx: 769.184562 #919.222563
+   cy: 278.124227 #521.393524
 
 
 # Extrinsic parameter between IMU and Camera.
-estimate_extrinsic: 0   # 0  Have an accurate extrinsic parameters. We will trust the following imu^R_cam, imu^T_cam, don't change it.
+estimate_extrinsic: 2   # 0  Have an accurate extrinsic parameters. We will trust the following imu^R_cam, imu^T_cam, don't change it.
                         # 1  Have an initial guess about extrinsic parameters. We will optimize around your initial guess.
                         # 2  Don't know anything about extrinsic parameters. You don't need to give R,T. We will try to calibrate it. Do some rotation movement at beginning.                        
 #If you choose 0 or 1, you should write down the following matrix.
@@ -31,21 +32,24 @@ extrinsicRotation: !!opencv-matrix
    rows: 3
    cols: 3
    dt: d
-   data: # front cam [ -0.0389980,  0.0110205,  0.9991785,
-         #  -0.9992386,  0.0007855, -0.0390090,
-         #  -0.0012147, -0.9999390,  0.0109815 ]
-    [ 0.0598217,  0.0110955, -0.9981474,
-      0.9896813, -0.1310858,  0.0578571,
-     -0.1302010, -0.9913089, -0.0188228 ]
+   data: [ 0.0598217,  0.0110955, -0.9981474,
+           0.9896813, -0.1310858,  0.0578571,
+          -0.1302010, -0.9913089, -0.0188228 ]
 extrinsicTranslation: !!opencv-matrix
    rows: 3
    cols: 1
    dt: d
-   data: [-3.739, 0.000, 0.840] #front[-3.739, 0.000, 0.840]
+   data: [-3.739, 0.000, 0.840]
+
+# Extrinsic parameter between IMU and Camera.
+estimate_extrinsic: 2   # 0  Have an accurate extrinsic parameters. We will trust the following imu^R_cam, imu^T_cam, don't change it.
+                        # 1  Have an initial guess about extrinsic parameters. We will optimize around your initial guess.
+                        # 2  Don't know anything about extrinsic parameters. You don't need to give R,T. We will try to calibrate it. Do some rotation movement at beginning.                        
+#If you choose 0 or 1, you should write down the following matrix.
 
 #feature traker paprameters
-max_cnt: 300            # max feature number in feature tracking
-min_dist: 15            # min distance between two features 
+max_cnt: 200            # max feature number in feature tracking
+min_dist: 30            # min distance between two features 
 freq: 10                # frequence (Hz) of publish tracking result. At least 10Hz for good estimation. If set 0, the frequence will be same as raw image 
 F_threshold: 1.0        # ransac threshold (pixel)
 show_track: 1           # publish tracking image as topic
@@ -55,23 +59,24 @@ fisheye: 0              # if using fisheye, trun on it. A circle mask will be lo
 #optimization parameters
 max_solver_time: 0.04  # max solver itration time (ms), to guarantee real time
 max_num_iterations: 8   # max solver itrations, to guarantee real time
-keyframe_parallax: 5.0 # keyframe selection threshold (pixel)
+keyframe_parallax: 10.0 # keyframe selection threshold (pixel)
 
+#imu parameters       The more accurate parameters you provide, the better performance
 acc_n: 0.1          # accelerometer measurement noise standard deviation. #0.2
 gyr_n: 0.02         # gyroscope measurement noise standard deviation.     #0.05
 acc_w: 0.002         # accelerometer bias random work noise standard deviation.  #0.02
 gyr_w: 4.0e-5       # gyroscope bias random work noise standard deviation.     #4.0e-5
-g_norm: 9.81     # gravity magnitude
+g_norm: 9.81007     # gravity magnitude
 
 #loop closure parameters
-loop_closure: 0                    # start loop closure
-load_previous_pose_graph: 0        # load and reuse previous pose graph; load from 'pose_graph_save_path'
-fast_relocalization: 0             # useful in real-time and large project
-pose_graph_save_path: "/home/tony-ws1/output/pose_graph/" # save and load path
+loop_closure: 0                 # start loop closure
+load_previous_pose_graph: 0     # load and reuse previous pose graph; load from 'pose_graph_save_path'
+fast_relocalization: 0          # useful in real-time and large project
+pose_graph_save_path: "/home/mikolaj" # save and load path
 
 #unsynchronization parameters
 estimate_td: 1                      # online estimate time offset between camera and imu
-td: 0.05                             # initial value of time offset. unit: s. readed image clock + td = real image clock (IMU clock)
+td: 457755                             # initial value of time offset. unit: s. readed image clock + td = real image clock (IMU clock)
 
 #rolling shutter parameters
 rolling_shutter: 0                  # 0: global shutter camera, 1: rolling shutter camera
