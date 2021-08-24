@@ -251,6 +251,8 @@ bool Estimator::initialStructure()
     Vector3d T[frame_count + 1];
     map<int, Vector3d> sfm_tracked_points;
     vector<SFMFeature> sfm_f;
+
+    // Save all the features in f_manager to sfm_f where the SFMFeature object is stored
     for (auto &it_per_id : f_manager.feature)
     {
         int imu_j = it_per_id.start_frame - 1;
@@ -268,6 +270,8 @@ bool Estimator::initialStructure()
     Matrix3d relative_R;
     Vector3d relative_T;
     int l;
+    // Returns the first frame that meets the parallax in the sliding window, which is frame l, and RT, which can be triangulated.
+    // So rotation & translation from l-th frame to the current frame
     if (!relativePose(relative_R, relative_T, l))
     {
         ROS_INFO("Not enough features or parallax; Move device around");
@@ -643,7 +647,7 @@ bool Estimator::failureDetection()
     }
     */
     Vector3d tmp_P = Ps[WINDOW_SIZE];
-    if ((tmp_P - last_P).norm() > 5)
+    if ((tmp_P - last_P).norm() > 15)
     {
         ROS_INFO(" big translation");
         return true;

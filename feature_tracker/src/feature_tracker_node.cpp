@@ -43,7 +43,7 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
         pub_count = 1;
         std_msgs::Bool restart_flag;
         restart_flag.data = true;
-        pub_restart.publish(restart_flag);
+        //pub_restart.publish(restart_flag);
         return;
     }
     last_image_time = img_msg->header.stamp.toSec();
