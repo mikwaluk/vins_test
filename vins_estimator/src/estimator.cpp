@@ -476,6 +476,7 @@ bool Estimator::relativePose(Matrix3d &relative_R, Vector3d &relative_T, int &l)
                 ROS_DEBUG("average_parallax %f choose l %d and newest frame to triangulate the whole structure", average_parallax * 460, l);
                 return true;
             }
+            ROS_ERROR("average_parallax %f", average_parallax * 460);
         }
     }
     return false;
@@ -631,6 +632,7 @@ void Estimator::double2vector()
 
 bool Estimator::failureDetection()
 {
+    ROS_INFO("Features tracked: %d", f_manager.last_track_num);
     if (f_manager.last_track_num < 2)
     {
         ROS_INFO(" little feature %d", f_manager.last_track_num);

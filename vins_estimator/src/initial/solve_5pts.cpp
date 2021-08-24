@@ -221,7 +221,11 @@ bool MotionEstimator::solveRelativeRT(const vector<pair<Vector3d, Vector3d>> &co
         if(inlier_cnt > 12)
             return true;
         else
+        {
+            ROS_ERROR("too few inliers for initial RT!");
             return false;
+        }
+            
     }
     return false;
 }
