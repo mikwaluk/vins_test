@@ -1,5 +1,6 @@
 #include "visualization.h"
 #include <visualization_msgs/Marker.h>
+#include <logging_msgs/Bias.h>
 
 using namespace ros;
 using namespace Eigen;
@@ -10,6 +11,7 @@ ros::Publisher pub_key_poses;
 ros::Publisher pub_relo_relative_pose;
 ros::Publisher pub_camera_pose;
 ros::Publisher pub_camera_pose_visual;
+ros::Publisher pub_biases;
 nav_msgs::Path path, relo_path;
 
 ros::Publisher pub_keyframe_pose;
@@ -37,6 +39,7 @@ void registerPub(ros::NodeHandle &n)
     pub_keyframe_point = n.advertise<sensor_msgs::PointCloud>("keyframe_point", 1000);
     pub_extrinsic = n.advertise<nav_msgs::Odometry>("extrinsic", 1000);
     pub_relo_relative_pose=  n.advertise<nav_msgs::Odometry>("relo_relative_pose", 1000);
+    pub_biases = n.advertise<logging_msgs::Bias>("estimated_bias", 1000);
 
     cameraposevisual.setScale(1);
     cameraposevisual.setLineWidth(0.05);
@@ -443,4 +446,18 @@ void pubRelocalization(const Estimator &estimator)
     odometry.twist.twist.linear.y = estimator.relo_frame_index;
 
     pub_relo_relative_pose.publish(odometry);
+}
+
+void pubBiases(const Estimator &estimator, const std_msgs::Header &header)
+{
+    logging_msgs::Bias bias;
+    bias.header = header;
+    bias.bias_acc.x = estimator.Bas[WINDOW_SIZE][0];
+    bias.bias_acc.y = estimator.Bas[WINDOW_SIZE][1];
+    bias.bias_acc.z = estimator.Bas[WINDOW_SIZE][2];
+    bias.bias_gyro.x = estimator.Bgs[WINDOW_SIZE][0];
+    bias.bias_gyro.y = estimator.Bgs[WINDOW_SIZE][1];
+    bias.bias_gyro.z = estimator.Bgs[WINDOW_SIZE][2];
+
+    pub_biases.publish(bias);
 }

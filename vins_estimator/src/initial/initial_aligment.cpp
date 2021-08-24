@@ -54,6 +54,7 @@ MatrixXd TangentBasis(Vector3d &g0)
 
 void RefineGravity(map<double, ImageFrame> &all_image_frame, Vector3d &g, VectorXd &x)
 {
+    // Direction from previous step, magnitude from params
     Vector3d g0 = g.normalized() * G.norm();
     Vector3d lx, ly;
     //VectorXd x;
