@@ -56,6 +56,9 @@ void RefineGravity(map<double, ImageFrame> &all_image_frame, Vector3d &g, Vector
 {
     // Direction from previous step, magnitude from params
     Vector3d g0 = g.normalized() * G.norm();
+    //ROS_WARN_STREAM("G: " << G[0] << " " << G[1] << " " << G[2]);
+    //ROS_WARN_STREAM("g0: " << g0[0] << " " << g0[1] << " " << g0[2]);
+    //ROS_WARN_STREAM("g: " << g[0] << " " << g[1] << " " << g[2]);
     Vector3d lx, ly;
     //VectorXd x;
     int all_frame_count = all_image_frame.size();
@@ -121,6 +124,7 @@ void RefineGravity(map<double, ImageFrame> &all_image_frame, Vector3d &g, Vector
             //double s = x(n_state - 1);
     }   
     g = g0;
+    //ROS_WARN_STREAM("final g: " << g[0] << " " << g[1] << " " << g[2]);
 }
 
 bool LinearAlignment(map<double, ImageFrame> &all_image_frame, Vector3d &g, VectorXd &x)
@@ -179,15 +183,15 @@ bool LinearAlignment(map<double, ImageFrame> &all_image_frame, Vector3d &g, Vect
     b = b * 1000.0;
     x = A.ldlt().solve(b);
     double s = x(n_state - 1) / 100.0;
-    ROS_DEBUG("estimated scale: %f", s);
+    ROS_INFO("estimated scale: %f", s);
     g = x.segment<3>(n_state - 4);
-    ROS_DEBUG_STREAM(" result g     " << g.norm() << " " << g.transpose());
+    
     if(fabs(g.norm() - G.norm()) > 1.0 || s < 0)
     {
         return false;
     }
-
     RefineGravity(all_image_frame, g, x);
+    ROS_INFO_STREAM(" result g     " << g.norm() << " " << g.transpose());
     s = (x.tail<1>())(0) / 100.0;
     (x.tail<1>())(0) = s;
     ROS_DEBUG_STREAM(" refine     " << g.norm() << " " << g.transpose());

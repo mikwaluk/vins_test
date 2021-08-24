@@ -9,16 +9,17 @@
 #include <fstream>
 
 const double FOCAL_LENGTH = 460.0;
-const int WINDOW_SIZE = 5;
+const int WINDOW_SIZE = 8;
 const int NUM_OF_CAM = 1;
-const int NUM_OF_F = 400;
+const int NUM_OF_F = 300;
 //#define UNIT_SPHERE_ERROR
 
 extern double INIT_DEPTH;
 extern double MIN_PARALLAX;
 extern int ESTIMATE_EXTRINSIC;
 
-extern double ACC_N, ACC_W;
+extern double /*ACC_N,*/ ACC_W;
+extern Eigen::Vector3d ACC_N; // Vector of accelerometer x,y,z noise variances
 extern double GYR_N, GYR_W;
 
 extern std::vector<Eigen::Matrix3d> RIC;

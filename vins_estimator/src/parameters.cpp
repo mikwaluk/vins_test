@@ -2,7 +2,8 @@
 
 double INIT_DEPTH;
 double MIN_PARALLAX;
-double ACC_N, ACC_W;
+double /*ACC_N,*/ ACC_W;
+Eigen::Vector3d ACC_N;
 double GYR_N, GYR_W;
 
 std::vector<Eigen::Matrix3d> RIC;
@@ -67,7 +68,9 @@ void readParameters(ros::NodeHandle &n)
     std::ofstream fout(VINS_RESULT_PATH, std::ios::out);
     fout.close();
 
-    ACC_N = fsSettings["acc_n"];
+    ACC_N.x() = std::pow(static_cast<double>(fsSettings["acc_x_std_dev"]), 2);
+    ACC_N.y() = std::pow(static_cast<double>(fsSettings["acc_y_std_dev"]), 2);
+    ACC_N.z() = std::pow(static_cast<double>(fsSettings["acc_z_std_dev"]), 2);
     ACC_W = fsSettings["acc_w"];
     GYR_N = fsSettings["gyr_n"];
     GYR_W = fsSettings["gyr_w"];

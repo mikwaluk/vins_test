@@ -122,12 +122,16 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
     ROS_DEBUG("new image coming ------------------------------------------");
     ROS_DEBUG("Adding feature points %lu", image.size());
     if (f_manager.addFeatureCheckParallax(frame_count, image, td))
+    {
+        // "Normal" marginalization, marginalize the old state
         marginalization_flag = MARGIN_OLD;
+    }
     else
+        // Marginalize the new frame (e.g due to too small parallax)
         marginalization_flag = MARGIN_SECOND_NEW;
-
+    ROS_DEBUG_STREAM(marginalization_flag);
     ROS_DEBUG("this frame is--------------------%s", marginalization_flag ? "reject" : "accept");
-    ROS_DEBUG("%s", marginalization_flag ? "Non-keyframe" : "Keyframe");
+    ROS_INFO("%s", marginalization_flag ? "Non-keyframe" : "Keyframe");
     ROS_DEBUG("Solving %d", frame_count);
     ROS_DEBUG("number of feature: %d", f_manager.getFeatureCount());
     Headers[frame_count] = header;
@@ -402,6 +406,7 @@ bool Estimator::visualInitialAlign()
     f_manager.triangulate(Ps, &(TIC_TMP[0]), &(RIC[0]));
 
     double s = (x.tail<1>())(0);
+    ROS_WARN("Final scale: %f", s);
     for (int i = 0; i <= WINDOW_SIZE; i++)
     {
         pre_integrations[i]->repropagate(Vector3d::Zero(), Bgs[i]);
@@ -438,8 +443,8 @@ bool Estimator::visualInitialAlign()
         Rs[i] = rot_diff * Rs[i];
         Vs[i] = rot_diff * Vs[i];
     }
-    ROS_DEBUG_STREAM("g0     " << g.transpose());
-    ROS_DEBUG_STREAM("my R0  " << Utility::R2ypr(Rs[0]).transpose()); 
+    ROS_WARN_STREAM("g0     " << g.transpose());
+    ROS_WARN_STREAM("my R0  " << Utility::R2ypr(Rs[0]).transpose()); 
 
     for (int i = frame_count; i >= 0; i--) {
         // Restore x, y and yaw from the previous estimation
@@ -632,7 +637,7 @@ void Estimator::double2vector()
 
 bool Estimator::failureDetection()
 {
-    ROS_INFO("Features tracked: %d", f_manager.last_track_num);
+    //ROS_INFO("Features tracked: %d", f_manager.last_track_num);
     if (f_manager.last_track_num < 2)
     {
         ROS_INFO(" little feature %d", f_manager.last_track_num);
@@ -656,12 +661,12 @@ bool Estimator::failureDetection()
     }
     */
     Vector3d tmp_P = Ps[WINDOW_SIZE];
-    if ((tmp_P - last_P).norm() > 5)
+    if ((tmp_P - last_P).norm() > 10)
     {
         ROS_INFO(" big translation");
-        //return true;
+        return true;
     }
-    if (abs(tmp_P.z() - last_P.z()) > 1)
+    if (abs(tmp_P.z() - last_P.z()) > 10)
     {
         ROS_INFO(" big z translation");
         return true; 

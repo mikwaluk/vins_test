@@ -303,13 +303,13 @@ bool GlobalSFM::construct(int frame_num, Quaterniond* q, Vector3d* T, int l,
 		q[i].y() = c_rotation[i][2]; 
 		q[i].z() = c_rotation[i][3]; 
 		q[i] = q[i].inverse();
-		//cout << "final  q" << " i " << i <<"  " <<q[i].w() << "  " << q[i].vec().transpose() << endl;
+		//ROS_WARN_STREAM("final  q" << " i " << i <<"  " <<q[i].w() << "  " << q[i].vec().transpose() << endl);
 	}
 	for (int i = 0; i < frame_num; i++)
 	{
 
 		T[i] = -1 * (q[i] * Vector3d(c_translation[i][0], c_translation[i][1], c_translation[i][2]));
-		//cout << "final  t" << " i " << i <<"  " << T[i](0) <<"  "<< T[i](1) <<"  "<< T[i](2) << endl;
+		//ROS_WARN_STREAM("final  t" << " i " << i <<"  " << T[i](0) <<"  "<< T[i](1) <<"  "<< T[i](2) << endl);
 	}
 	for (int i = 0; i < (int)sfm_f.size(); i++)
 	{
