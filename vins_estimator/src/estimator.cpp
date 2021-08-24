@@ -219,6 +219,7 @@ bool Estimator::initialStructure()
 {
     TicToc t_sfm;
     //check imu observibility
+    // 1. Judge whether the IMU has sufficient motion to initialize by the acceleration standard deviation.
     {
         map<double, ImageFrame>::iterator frame_it;
         Vector3d sum_g;
@@ -440,6 +441,12 @@ bool Estimator::visualInitialAlign()
     ROS_DEBUG_STREAM("g0     " << g.transpose());
     ROS_DEBUG_STREAM("my R0  " << Utility::R2ypr(Rs[0]).transpose()); 
 
+    for (int i = frame_count; i >= 0; i--) {
+        // Restore x, y and yaw from the previous estimation
+        Ps[i].x() += last_published_T.x();
+        Ps[i].y() += last_published_T.y();
+        Rs[i] *=  Utility::ypr2R(Eigen::Vector3d(Utility::R2ypr(last_published_R).x(), 0, 0));
+    }
     return true;
 }
 

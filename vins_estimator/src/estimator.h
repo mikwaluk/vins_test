@@ -136,4 +136,7 @@ class Estimator
     Vector3d relo_relative_t;
     Quaterniond relo_relative_q;
     double relo_relative_yaw;
+
+    Eigen::Vector3d last_published_T;
+    Eigen::Matrix3d last_published_R;
 };

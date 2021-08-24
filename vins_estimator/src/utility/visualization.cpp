@@ -105,7 +105,7 @@ void printStatistics(const Estimator &estimator, double t)
         ROS_INFO("td %f", estimator.td);
 }
 
-void pubOdometry(const Estimator &estimator, const std_msgs::Header &header)
+void pubOdometry(const Estimator &estimator, const std_msgs::Header &header, Vector3d &last_T, Matrix3d &last_R)
 {
     if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR)
     {
@@ -118,6 +118,8 @@ void pubOdometry(const Estimator &estimator, const std_msgs::Header &header)
         odometry.pose.pose.position.x = estimator.Ps[WINDOW_SIZE].x();
         odometry.pose.pose.position.y = estimator.Ps[WINDOW_SIZE].y();
         odometry.pose.pose.position.z = estimator.Ps[WINDOW_SIZE].z();
+        last_T = estimator.Ps[WINDOW_SIZE];
+        last_R = estimator.Rs[WINDOW_SIZE];
         odometry.pose.pose.orientation.x = tmp_Q.x();
         odometry.pose.pose.orientation.y = tmp_Q.y();
         odometry.pose.pose.orientation.z = tmp_Q.z();

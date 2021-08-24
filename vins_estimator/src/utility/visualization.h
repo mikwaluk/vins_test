@@ -35,7 +35,7 @@ void pubLatestOdometry(const Eigen::Vector3d &P, const Eigen::Quaterniond &Q, co
 
 void printStatistics(const Estimator &estimator, double t);
 
-void pubOdometry(const Estimator &estimator, const std_msgs::Header &header);
+void pubOdometry(const Estimator &estimator, const std_msgs::Header &header, Vector3d &last_T, Matrix3d &last_R);
 
 void pubInitialGuess(const Estimator &estimator, const std_msgs::Header &header);
 

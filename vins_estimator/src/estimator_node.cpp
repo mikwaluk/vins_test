@@ -317,7 +317,7 @@ void process()
             std_msgs::Header header = img_msg->header;
             header.frame_id = "world";
 
-            pubOdometry(estimator, header);
+            pubOdometry(estimator, header, estimator.last_published_T, estimator.last_published_R);
             pubKeyPoses(estimator, header);
             pubCameraPose(estimator, header);
             pubPointCloud(estimator, header);

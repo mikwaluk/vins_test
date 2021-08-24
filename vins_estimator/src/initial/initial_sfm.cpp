@@ -1,4 +1,5 @@
 #include "initial_sfm.h"
+#include <ros/ros.h>
 
 GlobalSFM::GlobalSFM(){}
 
@@ -24,14 +25,17 @@ bool GlobalSFM::solveFrameByPnP(Matrix3d &R_initial, Vector3d &P_initial, int i,
 {
 	vector<cv::Point2f> pts_2_vector;
 	vector<cv::Point3f> pts_3_vector;
+	// Loop over all available features
 	for (int j = 0; j < feature_num; j++)
 	{
+		// But they have to be triangulated already
 		if (sfm_f[j].state != true)
 			continue;
 		Vector2d point2d;
+		// loop over all observations of feature j
 		for (int k = 0; k < (int)sfm_f[j].observation.size(); k++)
 		{
-			if (sfm_f[j].observation[k].first == i)
+			if (sfm_f[j].observation[k].first == i) // only interested in the 2D observation in frame i
 			{
 				Vector2d img_pts = sfm_f[j].observation[k].second;
 				cv::Point2f pts_2(img_pts(0), img_pts(1));
@@ -45,8 +49,11 @@ bool GlobalSFM::solveFrameByPnP(Matrix3d &R_initial, Vector3d &P_initial, int i,
 	if (int(pts_2_vector.size()) < 15)
 	{
 		printf("unstable features tracking, please slowly move you device!\n");
-		if (int(pts_2_vector.size()) < 10)
+		if (int(pts_2_vector.size()) < 6)
+		{
+			ROS_ERROR("Less than 6 correspondences, returning false");
 			return false;
+		}
 	}
 	cv::Mat r, rvec, t, D, tmp_r;
 	cv::eigen2cv(R_initial, tmp_r);
@@ -54,9 +61,10 @@ bool GlobalSFM::solveFrameByPnP(Matrix3d &R_initial, Vector3d &P_initial, int i,
 	cv::eigen2cv(P_initial, t);
 	cv::Mat K = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
 	bool pnp_succ;
-	pnp_succ = cv::solvePnP(pts_3_vector, pts_2_vector, K, D, rvec, t, 1);
+	pnp_succ = cv::solvePnP(pts_3_vector, pts_2_vector, K, D, rvec, t, 0);
 	if(!pnp_succ)
 	{
+		ROS_ERROR("Failed to solve the PnP!");
 		return false;
 	}
 	cv::Rodrigues(rvec, r);
@@ -78,7 +86,7 @@ void GlobalSFM::triangulateTwoFrames(int frame0, Eigen::Matrix<double, 3, 4> &Po
 	assert(frame0 != frame1);
 	for (int j = 0; j < feature_num; j++)
 	{
-		if (sfm_f[j].state == true)
+		if (sfm_f[j].state == true) // No need to do anything if already triangulated
 			continue;
 		bool has_0 = false, has_1 = false;
 		Vector2d point0;
@@ -128,7 +136,7 @@ bool GlobalSFM::construct(int frame_num, Quaterniond* q, Vector3d* T, int l,
 	q[l].z() = 0;
 	T[l].setZero();
 	q[frame_num - 1] = q[l] * Quaterniond(relative_R);
-	T[frame_num - 1] = relative_T;
+	T[frame_num - 1] = T[l] + relative_T;
 	//cout << "init q_l " << q[l].w() << " " << q[l].vec().transpose() << endl;
 	//cout << "init t_l " << T[l].transpose() << endl;
 
@@ -158,6 +166,7 @@ bool GlobalSFM::construct(int frame_num, Quaterniond* q, Vector3d* T, int l,
 	for (int i = l; i < frame_num - 1 ; i++)
 	{
 		// solve pnp
+		// for each frame starting from l+1 until frame_num - 1
 		if (i > l)
 		{
 			Matrix3d R_initial = c_Rotation[i - 1];
