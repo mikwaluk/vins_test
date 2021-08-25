@@ -646,7 +646,7 @@ bool Estimator::failureDetection()
     if (Bas[WINDOW_SIZE].norm() > 2.5)
     {
         ROS_INFO(" big IMU acc bias estimation %f", Bas[WINDOW_SIZE].norm());
-        //return true;
+        return true;
     }
     if (Bgs[WINDOW_SIZE].norm() > 1.0)
     {
@@ -666,7 +666,7 @@ bool Estimator::failureDetection()
         ROS_INFO(" big translation");
         return true;
     }
-    if (abs(tmp_P.z() - last_P.z()) > 10)
+    if (abs(tmp_P.z() - last_P.z()) > 5)
     {
         ROS_INFO(" big z translation");
         return true; 

@@ -1,24 +1,24 @@
 %YAML:1.0
 
 #common parameters
-imu_topic: "/sensors/applanix/imu_data_gravity"
-image_topic: "/sensors/broadrreachcam_rear/image"
+imu_topic: "/imu/data_raw"
+image_topic: "/stereo/left/image_raw"
 output_path: "/home/mikolaj/Projects/catkin_vins/rviz/"
 
 #camera calibration 
 model_type: PINHOLE
 camera_name: camera
 image_width: 1280
-image_height: 800
+image_height: 560
 projection_parameters:
-   k1: 0.0
-   k2: 0.0
+   k1: -5.6143027800000002e-02
+   k2: 1.3952563200000001e-01
    p1: 0.0
    p2: 0.0
-   fx: 279.883600
-   fy: 283.607197
-   cx: 643.052984
-   cy: 398.301847
+   fx: 816.903789
+   fy: 811.568038
+   cx: 608.507263
+   cy: 263.475997
 
 
 # Extrinsic parameter between IMU and Camera.
@@ -31,17 +31,14 @@ extrinsicRotation: !!opencv-matrix
    rows: 3
    cols: 3
    dt: d
-   data: # front cam [ -0.0389980,  0.0110205,  0.9991785,
-         #  -0.9992386,  0.0007855, -0.0390090,
-         #  -0.0012147, -0.9999390,  0.0109815 ]
-    [ 0.0598217,  0.0110955, -0.9981474,
-      0.9896813, -0.1310858,  0.0578571,
-     -0.1302010, -0.9913089, -0.0188228 ]
+   data: [ -0.00680499, -0.0153215,    0.99985,
+           -0.999977,    0.000334627, -0.00680066,
+           -0.000230383,-0.999883,    -0.0153234 ]
 extrinsicTranslation: !!opencv-matrix
    rows: 3
    cols: 1
    dt: d
-   data: [-3.739, 0.000, 0.840] #front[-3.739, 0.000, 0.840]
+   data: [1.712, 0.247, -0.116]
 
 #feature traker paprameters
 max_cnt: 150            # max feature number in feature tracking

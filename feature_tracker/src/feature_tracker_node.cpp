@@ -37,14 +37,14 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
     // detect unstable camera stream
     if (img_msg->header.stamp.toSec() - last_image_time > 1.0 || img_msg->header.stamp.toSec() < last_image_time)
     {
-        ROS_WARN("image discontinue! reset the feature tracker!");
-        first_image_flag = true; 
-        last_image_time = 0;
-        pub_count = 1;
-        std_msgs::Bool restart_flag;
-        restart_flag.data = true;
+        ROS_WARN("image discontinue! (but don't) reset the feature tracker!");
+        //first_image_flag = true; 
+        //last_image_time = 0;
+        //pub_count = 1;
+        //std_msgs::Bool restart_flag;
+        //restart_flag.data = true;
         //pub_restart.publish(restart_flag);
-        return;
+        //return;
     }
     last_image_time = img_msg->header.stamp.toSec();
     // frequency control
