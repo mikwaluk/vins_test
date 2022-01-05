@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   camera_model
 )
 find_package(OpenCV REQUIRED)
-
+find_package(Ceres REQUIRED)
 catkin_package(
 
 )
@@ -32,12 +32,13 @@ find_package(Eigen3)
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
+  ${CERES_INCLUDE_DIRS}
 )
 
 add_executable(ar_demo_node src/ar_demo_node.cpp)
 
  target_link_libraries(ar_demo_node
-   ${catkin_LIBRARIES} ${OpenCV_LIBS}
+	 ${catkin_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES}
  )
 
 
